@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"sort"
 	"syscall"
 	"time")
 
@@ -13,7 +14,7 @@ func main()  {
 	options := TracerouteOptions{}
 	result := trace("8.8.8.8", &options)
 	endresult := calculateRank(result)
-	fmt.Println(endresult)
+	printArray(endresult)
 }
 
 func getLocalAddress() (addr [4]byte, err error) {
@@ -79,14 +80,29 @@ func calculateRank(input TracerouteResult) (ranks RankedHop)  {
 	ranks.Hops = []Distance{}
 
 	for i :=0; i<hopsLen; i++ {
-		fmt.Println(hops[i].Address, " took ", hops[i].Time )
 		if i+1 < hopsLen {
-			delta := hops[i].Time - hops[i+1].Time
-			info := fmt.Sprintf("time between hops %d and %d",i,i+1)
+			delta := timeAbs(hops[i].Time - hops[i+1].Time)
+			info := fmt.Sprintf("time between hops %d and %d ",i,i+1)
 			ranks.Hops = append(ranks.Hops, Distance{Title: info , Time: delta})
 		}
 	}
+	sort.Slice(ranks.Hops, func(i, j int) bool {
+		return ranks.Hops[i].Time > ranks.Hops[j].Time
+	})
 	return ranks
+}
+
+func timeAbs(time time.Duration) time.Duration {
+	if (time < 0) {
+		time = time * -1
+	}
+	return time
+}
+
+func printArray(data RankedHop)  {
+	for _,element := range data.Hops{
+		fmt.Println(element)
+	}
 }
 
 func setSocket(domain int,typ int, protocol int ) (fileDescriptor int) {
