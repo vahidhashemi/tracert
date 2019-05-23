@@ -43,5 +43,15 @@ You need to have root privileges for running tests
 $ sudo go test
 ```
 
+### General Idea
+
+Traceroute sends packets with TTL values that gradually increase from packet to packet,
+ starting with TTL value of one. Routers decrement TTL values of packets by one when routing and discard packets whose TTL value has reached zero(https://en.wikipedia.org/wiki/Traceroute).
+ <br/>
+ Instead of checking ICMP echo type we only rely on destination IP address, if the destination IP address we reached
+ was the one we have requested we've reached the desired destination. 
+
+
+
 
 
