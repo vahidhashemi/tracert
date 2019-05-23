@@ -15,6 +15,13 @@ jobs:
       - checkout
       # specify any bash command here prefixed with `run: `
       - run: go get -v -t -d ./...
+      - run: go build main.go models.go
+  test:
+    docker:
+      - image: circleci/golang:1.12.5
+    working_directory: /go/src/github.com/vahidhashemi/tracert
+    steps:
+      - checkout
       - run: go test -v ./...
 workflows:
   version: 2
