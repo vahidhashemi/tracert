@@ -44,7 +44,7 @@ func TestCalcRankNumberOfItems(t *testing.T) {
 	var tr = createDummyHops()
 	output := calculateRank(tr)
 	if (len(tr.Hops)-1 != len(output.Hops)) {
-		t.Errorf("Test Failed. Expected Three Item")
+		t.Errorf("Test Failed. Expected ", len(tr.Hops)-1 ," Item")
 	}
 }
 
