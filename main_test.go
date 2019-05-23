@@ -22,19 +22,19 @@ func createDummyHops() (tr TracerouteResult) {
 	return tr
 }
 
-//func TestTraceWithUrl(t *testing.T)  {
-//	result := runTrace("www.google.com")
-//	if len(result.Hops) == 0 {
-//		t.Errorf("Test Failed. Expected at Least One Hop")
-//	}
-//}
-//
-//func TestTraceWithIP(t *testing.T) {
-//	result := runTrace("8.8.8.8")
-//	if len(result.Hops) == 0 {
-//		t.Errorf("Test Failed. Expected at Least One Hop")
-//	}
-//}
+func TestTraceWithUrl(t *testing.T)  {
+	result := runTrace("www.google.com")
+	if len(result.Hops) == 0 {
+		t.Errorf("Test Failed. Expected at Least One Hop")
+	}
+}
+
+func TestTraceWithIP(t *testing.T) {
+	result := runTrace("8.8.8.8")
+	if len(result.Hops) == 0 {
+		t.Errorf("Test Failed. Expected at Least One Hop")
+	}
+}
 
 
 func TestCalcRankNumberOfItems(t *testing.T) {
