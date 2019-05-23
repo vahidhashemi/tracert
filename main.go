@@ -11,19 +11,19 @@ import (
 	"syscall"
 	"time"
 )
+
 var defaultPortNumber int = 33443
 var maxHops int = 30
 var timeoutMs int64 = 1000
 var retries int = 3
-func main()  {
 
+func main() {
 
 	urlParam := flag.String("address", "", "Enter an URL or an IP e.g. www.google.com or 1.1.1.")
-	portParam := flag.Int("port",defaultPortNumber, "Enter a Port Number")
+	portParam := flag.Int("port", defaultPortNumber, "Enter a Port Number")
 	maxhopsParam := flag.Int("maxhops", maxHops, "Enter Maximum Hop for tracing")
-	timeoutMsParam := flag.Int64("timeout",timeoutMs, "Enter Timeout in Milliseconds (1000 = 1s)")
+	timeoutMsParam := flag.Int64("timeout", timeoutMs, "Enter Timeout in Milliseconds (1000 = 1s)")
 	retriesParam := flag.Int("retry", retries, "Enter Number of Retries")
-
 
 	flag.Parse()
 	if *urlParam == "" {
@@ -33,7 +33,7 @@ func main()  {
 		flag.PrintDefaults()
 		os.Exit(2)
 	}
-	options := TracerouteOptions{Port:*portParam, MaxHops:*maxhopsParam,TimeoutMs:*timeoutMsParam,Retries:*retriesParam }
+	options := TracerouteOptions{Port: *portParam, MaxHops: *maxhopsParam, TimeoutMs: *timeoutMsParam, Retries: *retriesParam}
 	result := trace(*urlParam, &options)
 	endresult := calculateRank(result)
 	printArray(endresult)
@@ -74,8 +74,6 @@ func getDestinationAddress(dest string) (destAddr [4]byte, err error) {
 	return
 }
 
-
-
 func defaultOptions(options *TracerouteOptions) {
 	if options.Port == 0 {
 		options.Port = defaultPortNumber
@@ -96,16 +94,16 @@ func exitWithError(err error) {
 	os.Exit(1)
 }
 
-func calculateRank(input TracerouteResult) (ranks RankedHop)  {
+func calculateRank(input TracerouteResult) (ranks RankedHop) {
 	hopsLen := len(input.Hops)
 	hops := input.Hops
 	ranks.Hops = []Distance{}
 
-	for i :=0; i<hopsLen; i++ {
+	for i := 0; i < hopsLen; i++ {
 		if i+1 < hopsLen {
 			delta := timeAbs(hops[i+1].Time - hops[i].Time)
-			info := fmt.Sprintf("time between hops %d and %d ",i,i+1)
-			ranks.Hops = append(ranks.Hops, Distance{Title: info , Time: delta})
+			info := fmt.Sprintf("time between hops %d and %d ", i, i+1)
+			ranks.Hops = append(ranks.Hops, Distance{Title: info, Time: delta})
 		}
 	}
 	sort.Slice(ranks.Hops, func(i, j int) bool {
@@ -121,16 +119,16 @@ func timeAbs(time time.Duration) time.Duration {
 	return time
 }
 
-func printArray(data RankedHop)  {
-	for _,element := range data.Hops{
+func printArray(data RankedHop) {
+	for _, element := range data.Hops {
 		fmt.Println(element)
 	}
 }
 
-func setSocket(domain int,typ int, protocol int ) (fileDescriptor int) {
+func setSocket(domain int, typ int, protocol int) (fileDescriptor int) {
 	var err error
 	fileDescriptor, err = syscall.Socket(domain, typ, protocol)
-	if (err != nil){
+	if (err != nil) {
 		exitWithError(err)
 	}
 	return fileDescriptor
@@ -191,7 +189,6 @@ func trace(dest string, options *TracerouteOptions) (result TracerouteResult) {
 
 			log.Println(traceCount, "- ", "Received n=", n, ", from=", currAddr, ", t=", elapsed)
 			traceCount++;
-
 			ttl += 1
 			retry = 0
 

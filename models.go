@@ -11,7 +11,7 @@ type TracerouteOptions struct {
 
 type TracerouteHop struct {
 	Address [4]byte
-	Time time.Duration
+	Time    time.Duration
 }
 
 type TracerouteResult struct {
@@ -20,9 +20,8 @@ type TracerouteResult struct {
 
 type Distance struct {
 	Title string
-	Time time.Duration
+	Time  time.Duration
 }
 type RankedHop struct {
 	Hops []Distance
-
 }
