@@ -18,7 +18,7 @@ $ go build -o trace main.go models.go
 ```sh
 $ trace -address www.example.com
 ```
-Since This application is based on system calls you need to have root privlleges to run it. 
+Since This application is based on system calls you need to have root privileges to run it. 
 
 ### Usage
 There are optional parameters you can pass:
@@ -37,7 +37,7 @@ Usage : trace -address=address/ip [-port=portnumber][-maxhops=hopnumber][-timeou
 ```
 
 ### Run Test
-You need to have root privilleges for running tests
+You need to have root privileges for running tests
 
 ```sh
 $ sudo go test
