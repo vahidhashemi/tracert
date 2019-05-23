@@ -4,7 +4,7 @@ import "testing"
 
 func runTrace(addr string) (result TracerouteResult)   {
 	options := TracerouteOptions{ }
-	result = trace("8.8.8.8", &options)
+	result = trace(addr, &options)
 	return
 }
 

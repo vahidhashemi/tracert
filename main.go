@@ -159,7 +159,6 @@ func trace(dest string, options *TracerouteOptions) (result TracerouteResult) {
 	retry := 0
 	traceCount := 0
 	for {
-		traceCount++;
 		start := time.Now()
 
 		recvSocket := setSocket(syscall.AF_INET, syscall.SOCK_RAW, syscall.IPPROTO_ICMP)
@@ -187,8 +186,11 @@ func trace(dest string, options *TracerouteOptions) (result TracerouteResult) {
 		elapsed := time.Since(start)
 		if err == nil {
 			currAddr := from.(*syscall.SockaddrInet4).Addr
+
 			result.Hops = append(result.Hops, TracerouteHop{currAddr, elapsed})
+
 			log.Println(traceCount, "- ", "Received n=", n, ", from=", currAddr, ", t=", elapsed)
+			traceCount++;
 
 			ttl += 1
 			retry = 0
@@ -198,7 +200,6 @@ func trace(dest string, options *TracerouteOptions) (result TracerouteResult) {
 			}
 		} else {
 			retry += 1
-			log.Print(traceCount, "- ", "* t=", elapsed)
 			if retry > options.Retries {
 				ttl += 1
 				retry = 0
