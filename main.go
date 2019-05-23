@@ -2,17 +2,39 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"net"
 	"os"
 	"sort"
 	"syscall"
-	"time")
-
+	"time"
+)
+var defaultPortNumber int = 33443
+var maxHops int = 30
+var timeoutMs int64 = 1000
+var retries int = 3
 func main()  {
-	options := TracerouteOptions{}
-	result := trace("8.8.8.8", &options)
+
+
+	urlParam := flag.String("address", "", "Enter an URL or an IP e.g. www.google.com or 1.1.1.")
+	portParam := flag.Int("port",defaultPortNumber, "Enter a Port Number")
+	maxhopsParam := flag.Int("maxhops", maxHops, "Enter Maximum Hop for tracing")
+	timeoutMsParam := flag.Int64("timeout",timeoutMs, "Enter Timeout in Milliseconds (1000 = 1s)")
+	retriesParam := flag.Int("retry", retries, "Enter Number of Retries")
+
+
+	flag.Parse()
+	if *urlParam == "" {
+		fmt.Println("Usage : trace -address=address/ip [-port=portnumber][-maxhops=hopnumber][-timeout=milliseconds][-retry=retriesnumber]")
+		fmt.Println("")
+		flag.CommandLine.SetOutput(os.Stdout)
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
+	options := TracerouteOptions{Port:*portParam, MaxHops:*maxhopsParam,TimeoutMs:*timeoutMsParam,Retries:*retriesParam }
+	result := trace(*urlParam, &options)
 	endresult := calculateRank(result)
 	printArray(endresult)
 }
@@ -56,21 +78,21 @@ func getDestinationAddress(dest string) (destAddr [4]byte, err error) {
 
 func defaultOptions(options *TracerouteOptions) {
 	if options.Port == 0 {
-		options.Port = 33434
+		options.Port = defaultPortNumber
 	}
 	if options.MaxHops == 0 {
-		options.MaxHops = 30
+		options.MaxHops = maxHops
 	}
 	if options.TimeoutMs == 0 {
-		options.TimeoutMs = 1000
+		options.TimeoutMs = timeoutMs
 	}
 	if options.Retries == 0 {
-		options.Retries = 3
+		options.Retries = retries
 	}
 }
 
 func exitWithError(err error) {
-	fmt.Printf("%v\n", err)
+	fmt.Printf("Error %v\n", err)
 	os.Exit(1)
 }
 
@@ -81,7 +103,7 @@ func calculateRank(input TracerouteResult) (ranks RankedHop)  {
 
 	for i :=0; i<hopsLen; i++ {
 		if i+1 < hopsLen {
-			delta := timeAbs(hops[i].Time - hops[i+1].Time)
+			delta := timeAbs(hops[i+1].Time - hops[i].Time)
 			info := fmt.Sprintf("time between hops %d and %d ",i,i+1)
 			ranks.Hops = append(ranks.Hops, Distance{Title: info , Time: delta})
 		}
@@ -120,12 +142,12 @@ func trace(dest string, options *TracerouteOptions) (result TracerouteResult) {
 
 	socketAddr, err := getLocalAddress()
 	if (err != nil) {
-		exitWithError(nil)
+		exitWithError(err)
 	}
 
 	destAddr, err := getDestinationAddress(dest)
 	if (err != nil) {
-		exitWithError(nil)
+		exitWithError(err)
 	}
 
 	tv := syscall.NsecToTimeval(1000 * 1000 * options.TimeoutMs)
